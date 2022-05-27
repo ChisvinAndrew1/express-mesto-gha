@@ -43,7 +43,10 @@ function createUser(req, res, next) {
 
 function updateProfileAvatar(req, res, next) {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { avatar })
+  User.findByIdAndUpdate(req.user._id, { avatar }, {
+    new: true,
+    runValidators: true,
+  })
     .then((user) => {
       if (!user) {
         return next(new NotValidateData('Переданы некорректные данные при обновлении аватара'));

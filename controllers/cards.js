@@ -16,7 +16,12 @@ function getCards(_, res, next) {
 
 function DeleteCardById(req, res, next) {
   Card.findByIdAndRemove(req.params.id)
-    .then((card) => res.status(200).send(card))
+    .then((card) => {
+      if (!card) {
+        return next(new NotValidateData('Переданы некорректные данные при удалении карточки'));
+      }
+      return res.status(200).send(card);
+    })
     .catch((err) => {
       if (err.kind === 'ObjectId') {
         return next(new NotFoundError('Передан несуществующий _id карточки'));
