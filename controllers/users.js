@@ -34,8 +34,8 @@ function createUser(req, res, next) {
   })
     .then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (err.kind === 'ObjectId') {
-        return next(new NotFoundError('Пользователь по указанному _id не найден'));
+      if (err.name === 'ValidationError') {
+        return next(new NotValidateData('Переданы некорректные данные при создании профиля'));
       }
       return next(new SomeError());
     });
