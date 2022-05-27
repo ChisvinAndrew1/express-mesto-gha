@@ -16,10 +16,17 @@ function getUsers(_req, res, next) {
 
 function getUserById(req, res, next) {
   User.findById(req.params.id)
-    .then((user) => res.status(200).send(user))
+
+    .then((user) => {
+      if (!user) {
+        return next(new NotFoundError('Переданы некорректные данные при удалении карточки'));
+      }
+      return res.status(200).send(user);
+    })
     .catch((err) => {
+      console.log(err);
       if (err.kind === 'ObjectId') {
-        return next(new NotFoundError('Пользователь по указанному _id не найден'));
+        return next(new NotValidateData('Пользователь по указанному _id не найден'));
       }
       return next(new SomeError());
     });

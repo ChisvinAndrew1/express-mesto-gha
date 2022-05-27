@@ -20,14 +20,9 @@ function DeleteCardById(req, res, next) {
       if (!card) {
         return next(new NotValidateData('Переданы некорректные данные при удалении карточки'));
       }
-      return res.status(200).send(card);
+      return res.status(200).send({ message: 'Карточка удалена' });
     })
-    .catch((err) => {
-      if (err.kind === 'ObjectId') {
-        return next(new NotFoundError('Передан несуществующий _id карточки'));
-      }
-      return next(new SomeError());
-    });
+    .catch(() => next(new SomeError()));
 }
 
 function createCard(req, res, next) {
@@ -55,13 +50,13 @@ function updateLikes(req, res, next, method) {
   )
     .then((card) => {
       if (!card) {
-        return next(new NotValidateData('Переданы некорректные данные для постановки/снятии лайка'));
+        return next(new NotFoundError('Переданы некорректные данные для постановки/снятии лайка'));
       }
       return res.status(200).send(card);
     })
     .catch((err) => {
       if (err.kind === 'ObjectId') {
-        return next(new NotFoundError('Передан несуществующий _id карточки'));
+        return next(new NotValidateData('Передан несуществующий _id карточки'));
       }
       return next(new SomeError());
     });
