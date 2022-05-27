@@ -63,15 +63,15 @@ function updateProfile(req, res, next) {
   User.findByIdAndUpdate(req.user._id, {
     name,
     about,
+  }, {
+    new: true,
+    runValidators: true,
   })
-    .then((user) => {
-      if (!user) {
-        return next(new NotValidateData('Переданы некорректные данные при обновлении профиля'));
-      }
-      return res.status(200).send(user);
-    })
+    .then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (err.kind === 'ObjectId') {
+      if (err.name === 'ValidationError') {
+        return next(new NotValidateData('Переданы некорректные данные при обновлении профиля'));
+      } if (err.kind === 'ObjectId') {
         return next(new NotFoundError('Пользователь по указанному _id не найден'));
       }
       return next(new SomeError());
