@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const NotFoundError = require('./errors/NotFoundError');
 const { errorHandler } = require('./midllewars/errorHandler');
 // const router = require('./routers/users');
 
@@ -18,6 +19,10 @@ app.use((req, _, next) => {
 });
 app.use('/', require('./routers/users'));
 app.use('/', require('./routers/cards'));
+
+app.all('*', (_req, _res, next) => {
+  next(new NotFoundError('Запрашиваемый ресурс не найден'));
+});
 
 app.use(errorHandler);
 app.listen(PORT);

@@ -5,12 +5,7 @@ const User = require('../models/user');
 
 function getUsers(_req, res, next) {
   User.find({})
-    .then((users) => {
-      if (!users) {
-        return next(new NotValidateData('Переданы некорректные данные при создании пользователя'));
-      }
-      return res.status(200).send(users);
-    })
+    .then((users) => res.status(200).send(users))
     .catch(() => next(new SomeError()));
 }
 
@@ -56,13 +51,13 @@ function updateProfileAvatar(req, res, next) {
   })
     .then((user) => {
       if (!user) {
-        return next(new NotValidateData('Переданы некорректные данные при обновлении аватара'));
+        return next(new NotFoundError('Переданы некорректные данные при обновлении аватара'));
       }
       return res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.kind === 'ObjectId') {
-        return next(new NotFoundError('Пользователь по указанному _id не найден'));
+      if (err.name === 'ValidationError') {
+        return next(new NotValidateData('Пользователь по указанному _id не найден'));
       }
       return next(new SomeError());
     });

@@ -5,22 +5,22 @@ const Card = require('../models/card');
 
 function getCards(_, res, next) {
   Card.find({})
-    .then((cards) => {
-      if (!cards) {
-        return next(new NotValidateData('Переданы некорректные данные при создании карточки'));
-      }
-      return res.status(200).send(cards);
-    })
+    .then((cards) => res.status(200).send(cards))
     .catch(() => next(new SomeError()));
 }
 
 function DeleteCardById(req, res, next) {
   Card.findByIdAndRemove(
-    req.params.id,
+    req.params.cardId,
     { new: true },
   )
     // .orFail(() => next(new NotFoundError('Такой карточки не существует')))
-    .then((card) => res.status(200).send({ message: 'Карточка удалена', data: card }))
+    .then((card) => {
+      if (!card) {
+        return next(new NotFoundError('Карточка отсутствует'));
+      }
+      return res.status(200).send({ message: 'Карточка удалена', data: card });
+    })
     .catch((err) => {
       console.log(err);
       if (err.name === 'CastError') {
@@ -55,7 +55,7 @@ function updateLikes(req, res, next, method) {
   )
     .then((card) => {
       if (!card) {
-        return next(new NotFoundError('Переданы некорректные данные для постановки/снятии лайка'));
+        return next(new NotFoundError('Отсутствие данных для постановки/снятии лайка'));
       }
       return res.status(200).send(card);
     })
