@@ -15,14 +15,19 @@ function getCards(_, res, next) {
 }
 
 function DeleteCardById(req, res, next) {
-  Card.findByIdAndRemove(req.params.id)
-    .then((card) => {
-      if (!card) {
+  Card.findByIdAndRemove(
+    req.params.id,
+    { new: true },
+  )
+    // .orFail(() => next(new NotFoundError('Такой карточки не существует')))
+    .then((card) => res.status(200).send({ message: 'Карточка удалена', data: card }))
+    .catch((err) => {
+      console.log(err);
+      if (err.name === 'CastError') {
         return next(new NotValidateData('Переданы некорректные данные при удалении карточки'));
       }
-      return res.status(200).send({ message: 'Карточка удалена' });
-    })
-    .catch(() => next(new SomeError()));
+      return next(new SomeError());
+    });
 }
 
 function createCard(req, res, next) {
