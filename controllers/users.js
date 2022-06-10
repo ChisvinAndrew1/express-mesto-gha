@@ -130,7 +130,7 @@ function getMeInfo(req, res, next) {
       }
       return res.status(200).send(user);
     })
-    .catch(next);
+    .catch((err) => next(err));
 }
 
 module.exports = {
