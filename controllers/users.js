@@ -109,7 +109,12 @@ function login(req, res, next) {
       });
       res.send({ token });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return next(new NotValidateData('Переданы некорректные данные'));
+      }
+      return next(new SomeError());
+    });
 }
 
 function getMeInfo(req, res, next) {
