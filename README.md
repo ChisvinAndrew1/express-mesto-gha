@@ -13,6 +13,22 @@ https://github.com/ChisvinAndrew1/express-mesto-gha
 [![Tests for sprint 14](https://github.com/ChisvinAndrew1/express-mesto-gha/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/${имя_пользователя}/${имя репозитория}/actions/workflows/tests-14-sprint.yml)
 ```
 
+## перечень команд 
+ npm init -y (create package.json)
+ npm i express
+ npm i mogoose
+ npm i nodemon -D
+.editorconfig
+.eslint
+git init
+.gitignore
+{
+  npm i bcryptjs,
+  npm i jsonwebtoken,
+  npm i celebrate,
+  npm i cookie-parser,
+  npm install validator
+}
 
 ## Директории
 

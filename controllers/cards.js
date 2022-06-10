@@ -1,3 +1,4 @@
+const ForbiddenError = require('../errors/ForbiddenError');
 const NotFoundError = require('../errors/NotFoundError');
 const NotValidateData = require('../errors/NotValidateData');
 const SomeError = require('../errors/SomeError');
@@ -14,12 +15,13 @@ function DeleteCardById(req, res, next) {
     req.params.cardId,
     { new: true },
   )
-    // .orFail(() => next(new NotFoundError('Такой карточки не существует')))
+    .orFail(() => new NotFoundError('Такой карточки не существует'))
     .then((card) => {
-      if (!card) {
-        return next(new NotFoundError('Карточка отсутствует'));
+      if (!card.owner.equals(req.user._id)) {
+        return next(new ForbiddenError('Нельзя удалять чужие карточки'));
       }
-      return res.status(200).send({ message: 'Карточка удалена', data: card });
+      return card.remove()
+        .then(() => res.status(200).send({ message: 'Карточка удалена', data: card }));
     })
     .catch((err) => {
       console.log(err);

@@ -1,0 +1,29 @@
+const jsonwebtoken = require('jsonwebtoken');
+
+function auth(req, res, next) {
+  const { authorization } = req.headers;
+  if (!authorization || !authorization.startsWith('Bearer ')) {
+    return res
+      .status(401)
+      .send({ message: 'Необходима авторизация' });
+  }
+
+  const token = authorization.replace('Bearer ', '');
+  let payload;
+
+  try {
+    payload = jsonwebtoken.verify(token, 'some-secret-salt');
+  } catch (err) {
+    return res
+      .status(401)
+      .send({ message: 'Необходима авторизация' });
+  }
+
+  req.user = payload; // записываем пейлоуд в объект запроса
+
+  return next(); // пропускаем запрос дальше
+}
+
+module.exports = {
+  auth,
+};
