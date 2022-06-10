@@ -2,7 +2,7 @@ const bcryptjs = require('bcryptjs');
 const jsonwebtoken = require('jsonwebtoken');
 const ConflictError = require('../errors/ConflictError');
 const NotFoundError = require('../errors/NotFoundError');
-const NotValidateData = require('../errors/NotValidateData');
+// const NotValidateData = require('../errors/NotValidateData');
 const SomeError = require('../errors/SomeError');
 const User = require('../models/user');
 
@@ -27,7 +27,7 @@ function getUserById(req, res, next) {
     .catch((err) => {
       console.log(err);
       if (err.kind === 'ObjectId') {
-        return next(new NotValidateData('Пользователь по указанному _id не найден'));
+        return next(err);
       }
       return next(new SomeError());
     });
@@ -37,7 +37,6 @@ function createUser(req, res, next) {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  console.log(req.body);
   bcryptjs.hash(password, SALT_ROUNDS)
     .then((hash) => User.create({
       name,
@@ -46,10 +45,17 @@ function createUser(req, res, next) {
       email,
       password: hash,
     }))
-    .then((user) => res.status(200).send(user))
+    .then(() => res.status(201).send({
+      name,
+      about,
+      avatar,
+      email,
+    }))
     .catch((err) => {
+      // if (err.name === 'ValidationError') {
+      //   return next(new NotValidateData('Переданы некорректные данные при создании профиля'));
       if (err.name === 'ValidationError') {
-        return next(new NotValidateData('Переданы некорректные данные при создании профиля'));
+        return next(err);
       } if (err.code === CONFLICT_KEY_CODE) {
         return next(new ConflictError('Пользователь с таким Email уже создан'));
       }
@@ -71,7 +77,7 @@ function updateProfileAvatar(req, res, next) {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new NotValidateData('Пользователь по указанному _id не найден'));
+        return next(err);
       }
       return next(new SomeError());
     });
@@ -89,7 +95,7 @@ function updateProfile(req, res, next) {
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new NotValidateData('Переданы некорректные данные при обновлении профиля'));
+        return next(err);
       } if (err.kind === 'ObjectId') {
         return next(new NotFoundError('Пользователь по указанному _id не найден'));
       }
@@ -111,7 +117,7 @@ function login(req, res, next) {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new NotValidateData('Переданы некорректные данные'));
+        return next(err);
       }
       return next(new SomeError());
     });
