@@ -15,7 +15,7 @@ function DeleteCardById(req, res, next) {
     req.params.cardId,
     { new: true },
   )
-    .orFail(() => new NotFoundError('Такой карточки не существует'))
+    .orFail(() => next(new NotFoundError('Такой карточки не существует')))
     .then((card) => {
       if (!card.owner.equals(req.user._id)) {
         return next(new ForbiddenError('Нельзя удалять чужие карточки'));

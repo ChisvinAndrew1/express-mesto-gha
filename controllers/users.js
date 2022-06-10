@@ -2,7 +2,7 @@ const bcryptjs = require('bcryptjs');
 const jsonwebtoken = require('jsonwebtoken');
 const ConflictError = require('../errors/ConflictError');
 const NotFoundError = require('../errors/NotFoundError');
-// const NotValidateData = require('../errors/NotValidateData');
+const NotValidateData = require('../errors/NotValidateData');
 const SomeError = require('../errors/SomeError');
 const User = require('../models/user');
 
@@ -20,14 +20,14 @@ function getUserById(req, res, next) {
 
     .then((user) => {
       if (!user) {
-        return next(new NotFoundError('Переданы некорректные данные при удалении карточки'));
+        return next(new NotFoundError('Переданы некорректные данные при получении пользователя'));
       }
       return res.status(200).send(user);
     })
     .catch((err) => {
       console.log(err);
       if (err.kind === 'ObjectId') {
-        return next(err);
+        return next(new NotValidateData('Переданы некорректные данные при создании профиля'));
       }
       return next(new SomeError());
     });
@@ -115,12 +115,10 @@ function login(req, res, next) {
       });
       res.send({ token });
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return next(err);
-      }
-      return next(new SomeError());
-    });
+    .catch((err) => next(err));
+  // if (err.name === 'ValidationError') {
+  // }
+  // return next(new SomeError());
 }
 
 function getMeInfo(req, res, next) {
@@ -130,7 +128,7 @@ function getMeInfo(req, res, next) {
       if (!user) {
         return next(new NotFoundError('Пользователь не найден'));
       }
-      return res.status(201).send(user);
+      return res.status(200).send(user);
     })
     .catch(next);
 }
