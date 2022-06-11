@@ -55,7 +55,7 @@ function createUser(req, res, next) {
       // if (err.name === 'ValidationError') {
       //   return next(new NotValidateData('Переданы некорректные данные при создании профиля'));
       if (err.name === 'ValidationError') {
-        return next(err); //  next прокидывает ошибку в Joi, в соответствии с требованиями теста на gitHub, статус выкидываемой ошибки 400
+        return next(new NotValidateData('Переданы некорректные данные при создании профиля'));
       } if (err.code === CONFLICT_KEY_CODE) {
         return next(new ConflictError('Пользователь с таким Email уже создан'));
       }
@@ -77,7 +77,7 @@ function updateProfileAvatar(req, res, next) {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(err); //  next прокидывает ошибку в Joi, в соответствии с требованиями теста на gitHub, статус выкидываемой ошибки 400
+        return next(new NotValidateData('Переданы некорректные данные при создании профиля'));
       }
       return next(new SomeError());
     });
@@ -95,7 +95,7 @@ function updateProfile(req, res, next) {
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(err);
+        return next(new NotValidateData('Переданы некорректные данные при создании профиля'));
       } if (err.kind === 'ObjectId') {
         return next(new NotValidateData('Пользователь по указанному _id не найден'));
       }

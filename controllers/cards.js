@@ -13,7 +13,6 @@ function getCards(_, res, next) {
 function DeleteCardById(req, res, next) {
   Card.findById(
     req.params.cardId,
-    { new: true },
   )
     .orFail(() => next(new NotFoundError('Такой карточки не существует')))
     .then((card) => {
@@ -43,7 +42,7 @@ function createCard(req, res, next) {
     .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(err); //  next прокидывает ошибку в Joi, в соответствии с требованиями теста на gitHub, статус выкидываемой ошибки 400
+        return next(new NotValidateData('Переданы некорректные данные при создании профиля'));
       }
       return next(new SomeError());
     });
