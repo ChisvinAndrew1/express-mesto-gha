@@ -1,11 +1,10 @@
 const jsonwebtoken = require('jsonwebtoken');
+const Unauthorized = require('../errors/Unauthorized');
 
-function auth(req, res, next) {
+function auth(req, _res, next) {
   const { authorization } = req.headers;
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    return res
-      .status(401)
-      .send({ message: 'Необходима авторизация' });
+    return next(new Unauthorized());
   }
 
   const token = authorization.replace('Bearer ', '');
@@ -14,9 +13,7 @@ function auth(req, res, next) {
   try {
     payload = jsonwebtoken.verify(token, 'some-secret-salt');
   } catch (err) {
-    return res
-      .status(401)
-      .send({ message: 'Необходима авторизация' });
+    return next(new Unauthorized());
   }
 
   req.user = payload; // записываем пейлоуд в объект запроса

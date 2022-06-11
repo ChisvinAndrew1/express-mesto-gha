@@ -11,7 +11,7 @@ function getCards(_, res, next) {
 }
 
 function DeleteCardById(req, res, next) {
-  Card.findByIdAndRemove(
+  Card.findById(
     req.params.cardId,
     { new: true },
   )
@@ -21,7 +21,7 @@ function DeleteCardById(req, res, next) {
         return next(new ForbiddenError('Нельзя удалять чужие карточки'));
       }
       return card.remove()
-        .then(() => res.status(200).send({ message: 'Карточка удалена', data: card }));
+        .then(() => res.status(200).send({ message: 'Карточка удалена' }));
     })
     .catch((err) => {
       console.log(err);
@@ -43,7 +43,7 @@ function createCard(req, res, next) {
     .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(err);
+        return next(err); //  next прокидывает ошибку в Joi, в соответствии с требованиями теста на gitHub, статус выкидываемой ошибки 400
       }
       return next(new SomeError());
     });
